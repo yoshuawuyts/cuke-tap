@@ -1,0 +1,43 @@
+{
+  "name": "cuke-tap",
+  "version": "1.0.0",
+  "description": "Gherkin tap producing test harness",
+  "main": "index.js",
+  "scripts": {
+    "deps": "dependency-check . && dependency-check . --extra --no-dev",
+    "deps:pkg": "ncu",
+    "deps:update": "ncu -a",
+    "test": "standard && npm run deps && NODE_ENV=test node test",
+    "test:cov": "standard && npm run deps && NODE_ENV=test istanbul cover test/index.js"
+  },
+  "repository": "yoshuawuyts/cuke-tap",
+  "keywords": [
+    "gherkin",
+    "tap",
+    "tape",
+    "cucumber"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "concat-stream": "^1.5.0",
+    "flatten": "0.0.1",
+    "gherkin-parser": "^1.0.0",
+    "map-limit": "0.0.1",
+    "pump": "^1.0.0",
+    "safe-json-parse": "^1.0.1"
+  },
+  "devDependencies": {
+    "dependency-check": "^2.5.1",
+    "istanbul": "^0.3.19",
+    "npm-check-updates": "^2.2.0",
+    "standard": "^5.3.1",
+    "tap-parser": "^1.2.2",
+    "tape": "^4.2.0"
+  },
+  "files": [
+    "LICENSE",
+    "index.js",
+    "test*",
+    "README.md"
+  ]
+}
