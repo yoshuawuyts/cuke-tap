@@ -1,6 +1,6 @@
 {
   "name": "cuke-tap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Gherkin tap producing test harness",
   "main": "index.js",
   "scripts": {
