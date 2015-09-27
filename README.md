@@ -91,6 +91,9 @@ signature of `(regex, cb(t, world, params))` where:
 - [ ] add support for full syntax range (requires parser rewrite)
 - [ ] add support for table tests
 
+## See Also
+- [gherkin-parser](https://github.com/yoshuawuyts/gherkin-parser)
+
 ## License
 [MIT](https://tldrlegal.com/license/mit-license)
 
