@@ -93,6 +93,7 @@ signature of `(regex, cb(t, world, params))` where:
 
 ## See Also
 - [gherkin-parser](https://github.com/yoshuawuyts/gherkin-parser)
+- [tape](https://github.com/substack/tape)
 
 ## License
 [MIT](https://tldrlegal.com/license/mit-license)
