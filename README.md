@@ -14,6 +14,17 @@ $ npm install cuke-tap
 ```
 
 ## Usage
+__test/index.js__
+```js
+const cuke = require('cuke-tap')
+const path = require('path')
+
+const features = [ path.join(__dirname, '/feature.feature') ]
+const steps = [ require('./steps') ]
+
+cuke(features, steps)
+```
+
 __test/visit.feature__
 ```feature
 Feature: Example feature
@@ -57,18 +68,6 @@ test.then(/^I should see "(.*)" as the page title$/, (t, world, params) => {
   const document = world.window.document
   t.equal(document.title, 'baz, the best beep')
 })
-```
-
-__test/index.js__
-```js
-const cuke = require('cuke-tap')
-const jsdom = require('jsdom')
-const path = require('path')
-
-const features = [ path.join(__dirname, '/feature.feature') ]
-const steps = [ require('./steps') ]
-
-cuke(features, steps)
 ```
 
 ## API
