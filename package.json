@@ -19,19 +19,16 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "concat-stream": "^1.5.0",
-    "flatten": "0.0.1",
-    "gherkin-parser": "^1.0.0",
-    "map-limit": "0.0.1",
-    "pump": "^1.0.0",
-    "safe-json-parse": "^1.0.1"
+    "gherkin": "^4.0.0",
+    "pull-glob": "^1.0.6",
+    "pull-stream": "^3.4.3",
+    "tape": "^4.6.0"
   },
   "devDependencies": {
     "dependency-check": "^2.5.1",
     "istanbul": "^0.3.19",
     "npm-check-updates": "^2.2.0",
     "standard": "^5.3.1",
-    "tap-parser": "^1.2.2",
     "tape": "^4.2.0"
   },
   "files": [
