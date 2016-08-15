@@ -81,9 +81,9 @@ Run cucumber tests.
 - __options.features__ - either a glob string or array of file paths
   of `.feature` files in Gherkin syntax
 - __options.steps__ - an array of steps
-- __cb__ - an error-first callback when tests are done
+- __cb__ - an error-first callback after tests have been setup
 
-Each defined step is an array of `[regex, fn(t, world, params))` where:
+Each defined step is an array of `[regex, fn(t, world, params)]` where:
 - __regex__: the regex that is matched against the gherkin definitions
 - __t__: instance of tape's `t`
 - __world__: a `world` object that is shared between tests

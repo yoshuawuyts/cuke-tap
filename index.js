@@ -4,7 +4,7 @@ const pull = require('pull-stream/pull')
 const values = require('pull-stream/sources/values')
 const map = require('pull-stream/throughs/map')
 const asyncMap = require('pull-stream/throughs/async-map')
-const drain = require('pull-stream/sinks/drain')
+const onEnd = require('pull-stream/sinks/on-end')
 const glob = require('pull-glob')
 const Gherkin = require('gherkin')
 
@@ -25,7 +25,7 @@ function cukeTap (options, cb) {
     parseGherkin(),
     compilePickles(),
     runTests(steps),
-    drain(null, cb || noop)
+    onEnd(cb || ifErrThrow)
   )
 }
 
@@ -64,10 +64,15 @@ function runTests (steps) {
   return map(function (pickles) {
     const world = {}
 
-    pickles.forEach(function (pickle) {
-      tape(pickle.name, function (t) {
-        pickle.steps.forEach(function (step) {
-          const match = matchStep(steps, step)
+    return pickles.map(function (pickle) {
+      const matches = pickle.steps.map(function (step) {
+        return [step, matchStep(steps, step)]
+      })
+
+      return tape(pickle.name, function (t) {
+        matches.forEach(function (args) {
+          const step = args[0]
+          const match = args[1]
           t.test(step.text, function (st) {
             match.fn(st, world, match.params)
           })
@@ -93,4 +98,6 @@ function matchStep (steps, step) {
   return match
 }
 
-function noop () {}
+function ifErrThrow (err) {
+  if (err) throw err
+}
