@@ -19,13 +19,16 @@ __test/index.js__
 const cuke = require('cuke-tap')
 const path = require('path')
 
-const features = [ path.join(__dirname, '/feature.feature') ]
-const steps = [ require('./steps') ]
+const features = path.join(__dirname, 'example.feature')
+const steps = require('./steps')
 
-cuke(features, steps)
+cuke({
+  steps: steps,
+  features: features
+})
 ```
 
-__test/visit.feature__
+__test/example.feature__
 ```feature
 Feature: Example feature
   As a user of cucumber.js
@@ -43,43 +46,44 @@ __test/steps.js__
 const test = require('cuke-tap')
 const jsdom = require('jsdom')
 
-test.given(/^I am on the cuke-tap repo page$/, (t, world, params) => {
-  t.plan(1)
-  jsdom.env('http://localhost:1337', (err, window) => {
-    t.error(err)
-    world.window = window
-    window.location.pathname = '/foo'
-    t.pass('done')
-  }
-})
+module.exports = [
+  [/^I am on the cuke-tap repo page$/, (t, world, params) => {
+    t.plan(1)
+    jsdom.env('http://localhost:1337', (err, window) => {
+      t.error(err)
+      world.window = window
+      window.location.pathname = '/foo'
+      t.pass('done')
+    }
+  }],
+  [/^I go to the README file$/, (t, world, params) => {
+    t.plan(2)
+    const window = world.window
+    const document = window.document
+    const el = document.querySelectorAll('.foo.bar')
+    t.ok(el)
+    el.click()
+    t.equal(window.location.pathname, '/baz')
+  }],
+  [/^I should see "(.*)" as the page title$/, (t, world, params) => {
+    t.plan(1)
+    const document = world.window.document
+    t.equal(document.title, 'baz, the best beep')
+  }]
+]
 
-test.when(/^I go to the README file$/, (t, world, params) => {
-  t.plan(2)
-  const window = world.window
-  const document = window.document
-  const el = document.querySelectorAll('.foo.bar')
-  t.ok(el)
-  el.click()
-  t.equal(window.location.pathname, '/baz')
-})
 
-test.then(/^I should see "(.*)" as the page title$/, (t, world, params) => {
-  t.plan(1)
-  const document = world.window.document
-  t.equal(document.title, 'baz, the best beep')
-})
 ```
 
 ## API
-### cuke(features, steps, world)
+### cuke(options, cb)
 Run cucumber tests.
-- __features__ - an array of `.feature` files in Gherkin syntax
-- __steps__ - an array of steps functions
+- __options.features__ - either a glob string or array of file paths
+  of `.feature` files in Gherkin syntax
+- __options.steps__ - an array of steps
+- __cb__ - an error-first callback when tests are done
 
-### stepFunction(step)
-Create a step function that is imported by `cuke()`. `step` is an object with
-Gherkin syntax properties on it (e.g. `step.given`). Each defined step has a
-signature of `(regex, cb(t, world, params))` where:
+Each defined step is an array of `[regex, fn(t, world, params))` where:
 - __regex__: the regex that is matched against the gherkin definitions
 - __t__: instance of tape's `t`
 - __world__: a `world` object that is shared between tests
@@ -87,11 +91,10 @@ signature of `(regex, cb(t, world, params))` where:
 
 ## Todo
 - [x] get base version working
-- [ ] add support for full syntax range (requires parser rewrite)
+- [x] add support for full syntax range (requires parser rewrite)
 - [ ] add support for table tests
 
 ## See Also
-- [gherkin-parser](https://github.com/yoshuawuyts/gherkin-parser)
 - [tape](https://github.com/substack/tape)
 
 ## License
