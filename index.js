@@ -86,7 +86,7 @@ function matchStep (steps, step) {
     const fn = s[1]
     const matchGroup = regex.exec(step.text)
     if (matchGroup) {
-      match = { fn, params: matchGroup }
+      match = { fn: fn, params: matchGroup }
     }
   })
   if (!match) throw new Error(`step "${step.text}" did not match any known steps`)
