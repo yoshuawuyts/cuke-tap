@@ -22,7 +22,10 @@ const path = require('path')
 const features = path.join(__dirname, 'example.feature')
 const steps = require('./steps')
 
-cuke({ steps, features })
+cuke({
+  steps: steps,
+  features: features
+})
 ```
 
 __test/example.feature__
