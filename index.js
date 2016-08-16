@@ -13,7 +13,6 @@ module.exports = cukeTap
 // Gherkin tap producing test harness
 // (str) -> null
 function cukeTap (options, cb) {
-  const steps = options.steps
   const features = options.features
 
   pull(
@@ -24,7 +23,7 @@ function cukeTap (options, cb) {
     readFiles(),
     parseGherkin(),
     compilePickles(),
-    runTests(steps),
+    runTests(options),
     onEnd(cb || ifErrThrow)
   )
 }
@@ -56,27 +55,41 @@ function compilePickles () {
     const featurePath = args[0]
     const gherkinDocument = args[1]
     const pickles = compiler.compile(gherkinDocument, featurePath)
-    return pickles
+    return [gherkinDocument, pickles]
   })
 }
 
-function runTests (steps) {
-  return map(function (pickles) {
-    const world = {}
+function runTests (options) {
+  const steps = options.steps
+  const setup = options.setup || defaultSetup
+  const teardown = options.teardown || defaultTeardown
 
-    return pickles.map(function (pickle) {
-      const matches = pickle.steps.map(function (step) {
-        return [step, matchStep(steps, step)]
-      })
+  return asyncMap(function (args, cb) {
+    const gherkinDocument = args[0]
+    const pickles = args[1]
 
-      return tape(pickle.name, function (t) {
-        matches.forEach(function (args) {
-          const step = args[0]
-          const match = args[1]
-          t.test(step.text, function (st) {
-            match.fn(st, world, match.params)
+    setup(function (err, world) {
+      if (err) return cb(err)
+
+      pickles.forEach(function (pickle) {
+        const matches = pickle.steps.map(function (step) {
+          return [step, matchStep(steps, step)]
+        })
+
+        tape(pickle.name, function (t) {
+          matches.forEach(function (args) {
+            const step = args[0]
+            const match = args[1]
+            t.test(step.text, function (st) {
+              match.fn(st, world, match.params)
+            })
           })
         })
+      })
+
+      tape.onFinish(function (err) {
+        console.log('teardown', err)
+        teardown(err, world, cb)
       })
     })
   })
@@ -100,4 +113,12 @@ function matchStep (steps, step) {
 
 function ifErrThrow (err) {
   if (err) throw err
+}
+
+function defaultSetup (cb) {
+  cb(null, {})
+}
+
+function defaultTeardown (err, world, cb) {
+  cb(null)
 }
