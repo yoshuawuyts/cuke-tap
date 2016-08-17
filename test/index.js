@@ -3,7 +3,10 @@ const path = require('path')
 const test = require('tape')
 const cukeTap = require('../')
 
-const features = [path.join(__dirname, 'example.feature')]
+const features = [
+  path.join(__dirname, 'example.feature'),
+  path.join(__dirname, 'example-duplicate.feature')
+]
 const steps = require('./steps')
 
 cukeTap({

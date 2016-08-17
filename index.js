@@ -1,5 +1,6 @@
 const fs = require('fs')
 const tape = require('tape')
+const defaultTapeStream = require('tape/lib/default_stream')
 const pull = require('pull-stream/pull')
 const values = require('pull-stream/sources/values')
 const map = require('pull-stream/throughs/map')
@@ -61,24 +62,31 @@ function compilePickles () {
 }
 
 function runTests (steps) {
-  return map(function (pickles) {
+  return asyncMap(function (pickles, cb) {
     const world = {}
+    const test = tape.createHarness()
 
-    return pickles.map(function (pickle) {
-      const matches = pickle.steps.map(function (step) {
-        return [step, matchStep(steps, step)]
-      })
+    for (var i = 0; i < pickles.length; i++) {
+      const pickle = pickles[i]
+      test(pickle.name, function (t) { t.end() })
 
-      return tape(pickle.name, function (t) {
-        matches.forEach(function (args) {
-          const step = args[0]
-          const match = args[1]
-          t.test(step.text, function (st) {
-            match.fn(st, world, match.params)
-          })
+      const pSteps = pickle.steps
+      for (var j = 0; j < pSteps.length; j++) {
+        const step = pSteps[j]
+        const result = matchStep(steps, step)
+        const err = result[0]
+        const match = result[1]
+        if (err) return cb(err)
+
+        test(step.text, function (t) {
+          match.fn(t, world, match.params)
         })
-      })
-    })
+      }
+    }
+
+    test.onFinish(cb)
+    test.createStream()
+      .pipe(defaultTapeStream())
   })
 }
 
@@ -94,8 +102,8 @@ function matchStep (steps, step) {
       match = { fn: fn, params: matchGroup }
     }
   })
-  if (!match) throw new Error(`step "${step.text}" did not match any known steps`)
-  return match
+  if (!match) return [new Error(`step "${step.text}" did not match any known steps`)]
+  return [null, match]
 }
 
 function ifErrThrow (err) {
