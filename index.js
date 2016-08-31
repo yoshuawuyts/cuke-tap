@@ -6,9 +6,13 @@ const values = require('pull-stream/sources/values')
 const map = require('pull-stream/throughs/map')
 const asyncMap = require('pull-stream/throughs/async-map')
 const onEnd = require('pull-stream/sinks/on-end')
-const glob = require('pull-glob')
-const Gherkin = require('gherkin')
+const window = require('global/window')
+var Gherkin = require('gherkin')
 
+// Grrrrrrrrrrrrr
+if (window && window.Gherkin) {
+  Gherkin = window.Gherkin
+}
 module.exports = cukeTap
 
 // Gherkin tap producing test harness
@@ -33,11 +37,12 @@ function isArrayOfArrays (thing) {
 }
 
 function featureSource (features) {
-  if (isArrayOfArrays(features)) return values(features)
-  else {
+  if (isArrayOfArrays(features)) {
+    return values(features)
+  } else {
     return pull(
       typeof features === 'string'
-        ? glob(features)
+        ? require('pull-glob')(features)
         : values(features)
       ,
       readFiles()
@@ -48,7 +53,6 @@ function featureSource (features) {
 function readFiles () {
   return asyncMap(function (featurePath, cb) {
     fs.readFile(featurePath, 'utf8', function (err, featureSource) {
-      console.log('FEATURE SOURCE', featureSource)
       if (err) cb(err)
       else cb(null, [featurePath, featureSource])
     })
