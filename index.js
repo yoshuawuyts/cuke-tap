@@ -16,13 +16,8 @@ module.exports = cukeTap
 function cukeTap (options, cb) {
   const steps = options.steps
   const features = options.features
-
   pull(
-    typeof features === 'string'
-      ? glob(features)
-      : values(features)
-    ,
-    readFiles(),
+    featureSource(features),
     parseGherkin(),
     compilePickles(),
     runTests(steps),
@@ -30,9 +25,30 @@ function cukeTap (options, cb) {
   )
 }
 
+function isArrayOfArrays (thing) {
+  if (Array.isArray(thing)) {
+    return Array.isArray(thing[0])
+  }
+  return false
+}
+
+function featureSource (features) {
+  if (isArrayOfArrays(features)) return values(features)
+  else {
+    return pull(
+      typeof features === 'string'
+        ? glob(features)
+        : values(features)
+      ,
+      readFiles()
+    )
+  }
+}
+
 function readFiles () {
   return asyncMap(function (featurePath, cb) {
     fs.readFile(featurePath, 'utf8', function (err, featureSource) {
+      console.log('FEATURE SOURCE', featureSource)
       if (err) cb(err)
       else cb(null, [featurePath, featureSource])
     })
