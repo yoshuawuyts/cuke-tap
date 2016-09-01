@@ -6,13 +6,8 @@ const values = require('pull-stream/sources/values')
 const map = require('pull-stream/throughs/map')
 const asyncMap = require('pull-stream/throughs/async-map')
 const onEnd = require('pull-stream/sinks/on-end')
-const window = require('global/window')
 var Gherkin = require('gherkin')
 
-// Grrrrrrrrrrrrr
-if (window && window.Gherkin) {
-  Gherkin = window.Gherkin
-}
 module.exports = cukeTap
 
 // Gherkin tap producing test harness

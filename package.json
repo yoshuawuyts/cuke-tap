@@ -19,8 +19,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "gherkin": "^4.0.0",
-    "global": "^4.3.0",
+    "gherkin": "github:cucumber/gherkin-javascript",
     "pull-glob": "^1.0.6",
     "pull-stream": "^3.4.3",
     "tape": "^4.6.0"
