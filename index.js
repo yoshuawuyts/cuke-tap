@@ -6,8 +6,7 @@ const values = require('pull-stream/sources/values')
 const map = require('pull-stream/throughs/map')
 const asyncMap = require('pull-stream/throughs/async-map')
 const onEnd = require('pull-stream/sinks/on-end')
-const glob = require('pull-glob')
-const Gherkin = require('gherkin')
+var Gherkin = require('gherkin')
 
 module.exports = cukeTap
 
@@ -16,18 +15,34 @@ module.exports = cukeTap
 function cukeTap (options, cb) {
   const steps = options.steps
   const features = options.features
-
   pull(
-    typeof features === 'string'
-      ? glob(features)
-      : values(features)
-    ,
-    readFiles(),
+    featureSource(features),
     parseGherkin(),
     compilePickles(),
     runTests(steps),
     onEnd(cb || ifErrThrow)
   )
+}
+
+function isArrayOfArrays (thing) {
+  if (Array.isArray(thing)) {
+    return Array.isArray(thing[0])
+  }
+  return false
+}
+
+function featureSource (features) {
+  if (isArrayOfArrays(features)) {
+    return values(features)
+  } else {
+    return pull(
+      typeof features === 'string'
+        ? require('pull-glob')(features)
+        : values(features)
+      ,
+      readFiles()
+    )
+  }
 }
 
 function readFiles () {
